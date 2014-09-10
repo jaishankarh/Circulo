@@ -1,0 +1,131 @@
+<--/*player ball is colored white....
+the ball is moved around witht the help of mouse and keyboard...'w' to move the ball forward backward and the mouse to change the angle of the ball...
+when the user hits an enemy ball the game ends..
+this module is supposed to add the player functionality to the game..
+
+Date: 10.12.2013
+*/-->
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Ball Mouvment</title>
+ <meta charset=utf-8> 
+</head>
+<body>
+
+<canvas width="600" height="400" id="demo">
+Circulo
+</canvas>
+
+<script type="text/javascript" >
+var cto = document.getElementById("demo");
+var ctx = cto.getContext("2d");
+ctx.fillStyle = "#000000";
+ctx.fillRect(0,0,600,400);
+var x = 200;
+var y = 300;
+var STEP = 5;
+var ball = new orb(new vector(1,1),new vector(200,300),"enemy",2);
+
+function vector(x,y) // this object basically stores x and y components of either the velocity of the ball or the location
+  {
+    this.x = x;
+    this.y = y;
+  }
+
+
+
+function orb(velocity,location,ball_type,mass) // this is the generic ball that is generated and drawn randomly..
+  {
+    
+    this.location = location;
+    this.velocity = velocity;
+    this.ball_type = ball_type; ////newly added in this module..
+    this.mass = mass;
+  }
+
+function withinRange() {
+if(x<600)
+{
+alert(y)
+	if(y>-400)
+	  {return true;}
+	  }
+return false;
+	
+}
+
+function draw_ball()
+  {
+    
+    	ctx.fillStyle = "#000000";
+		ctx.fillRect(0,0,600,400);
+      var x = ball.location.x;
+      var y = ball.location.y;
+      //if(x<0 || x > 600||y>400 || y<0)
+      	//alert(x+':'+y);
+      ctx.beginPath();
+      ctx.arc(x,y,05,0,2*Math.PI);
+      ctx.strokeStyle = "#ffffff";
+	   ctx.stroke();
+    }
+  
+
+document.addEventListener("keydown",function (e) {doKeyDown(e)},false);
+  function doKeyDown(e)
+  {
+  		//alert(e.keyCode);
+  		switch(e.keyCode) {
+  			case 87: //w
+  				
+  				ball.location.x = ball.location.x - 3*ball.velocity.x;
+  				ball.location.y = ball.location.y - 3*ball.velocity.y;
+  				/*if (ball.location.x < 0 || ball.location.x > 600 || ball.location.y < 0 || ball.location.y > 400) {
+				alert(ball.location.x);
+}*/
+				break;
+			case 83://s
+				ball.location.x = ball.location.x + 3*ball.velocity.x;
+  				ball.location.y = ball.location.y + 3*ball.velocity.y;
+				break;
+			
+			
+			default : break;
+			
+}
+    
+  }
+  document.addEventListener("mousemove",function (e) {rotate_ball(e)},false);
+  
+	var mousepos = new vector(1,1);  
+  
+  function rotate_ball(e) {
+  		if(e.clientX!=null && e.clientY!=null)  	
+  		{	
+	  		var diff_x = mousepos.x - e.clientX;
+	  		var diff_y = mousepos.y - e.clientY;
+	  		var len = Math.sqrt((diff_x*diff_x)+(diff_y*diff_y));
+	  		var vel_x = diff_x/len;
+	  		var vel_y = diff_y/len;
+	  		if(!(isNaN(vel_x)||isNaN(vel_y)))
+	  		{
+		  		ball.velocity.x = vel_x;
+		  		ball.velocity.y = vel_y;
+	  		}
+		  		
+	  		mousepos.x = e.clientX;
+	  		mousepos.y = e.clientY;
+  		}
+  		
+	
+}
+	
+  //myVar = setInterval(draw_ball,15);
+  
+  //timeout = setInterval(function () {alert(ball.location.x);alert(ball.location.y)},10000);
+  
+</script>
+
+</body>
+</html>

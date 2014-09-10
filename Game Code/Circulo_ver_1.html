@@ -1,0 +1,424 @@
+<!--added arena radius and making the arena a circular one...
+In this module the balls move around and bounce against each other if they are collliding
+balls are generated after a fixed interval of time..if at the time of generation another stray ball is close to the center or spawning area then the generation does not take place
+The main physics that controls the bouncing of the balls is in the collisions function, do_enemy_collision function..
+--pink balls --- enemy balls
+//the earning treasure module does not work....yet....have to work on that....
+
+Date: 7.12.2013
+author: jaishankar hebballi
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Circulo</title>
+</head>
+
+<body>
+<canvas id="circulo" width="600" height="400" style="border:1px solid #000000">
+This is supported by my browser
+</canvas>
+
+<script>
+  var X_CENTER = 300;
+  var Y_CENTER = 200;
+  var X_BOUNDARY = 600;
+  var Y_BOUNDARY = 400;
+  var SMALL_RADIUS = 5;
+  var ENEMY_COLOR = '"#cc0099"';
+  var PLAYER_COLOR = '"#33ccff"';
+  var counter = 0;
+  var ORB_MASS = 2;
+  var ARENA_RADIUS = 200;
+  var treasure_timer=0;
+  var enemy_timer=0;
+  
+  var all_balls = new Array(); // this array object stores all the balls that are currently produced in the program
+  
+  var element = document.getElementById("circulo");
+  var ctx = element.getContext("2d");
+  ctx.fillStyle = "#000000";
+  ctx.fillRect(0,0,X_BOUNDARY,Y_BOUNDARY);
+  
+  
+  //definition of objects...
+  function vector(x,y) // this object basically stores x and y components of either the velocity of the ball or the location
+  {
+    this.x = x;
+    this.y = y;
+  }
+  
+  function orb(velocity,place,ball_type,mass) // this is the generic ball that is generated and drawn randomly..
+  {
+    
+    this.place = place;
+    this.velocity = velocity;
+    this.ball_type = ball_type; ////newly added in this module..
+    this.mass = mass;
+  }
+  
+  
+  function move_balls() // this function adds the velocity vector to the place vector (repesct to the ball) every time it is called.. hence giving an illusion of speed..
+  {
+    
+    for(var i = 0; i < all_balls.length; i++)
+    {
+      all_balls[i].place.x = all_balls[i].place.x - all_balls[i].velocity.x;
+      all_balls[i].place.y = all_balls[i].place.y - all_balls[i].velocity.y;
+    }
+  }
+  function colliding(ball1,ball2) //this function simply finds out if the balls in the parameters are colliding or not...if so returns true..else false
+  {
+		var xloc = ball1.place.x;
+		var yloc = ball1.place.y;
+		var x1loc = ball2.place.x;
+	  	var y1loc = ball2.place.y;
+	  	var diff_x = x1loc - xloc;
+	  	var diff_y = y1loc - yloc;
+	  	var len1 = diff_x*diff_x + diff_y*diff_y;
+	  	if(Math.sqrt(len1) <= SMALL_RADIUS*2+2)// the extra +2 is only for some kind of buffer so that the balls bounce off even before they actually touch each other..
+	  		return true;
+	  	return false;
+	}
+  function collisions()
+  {
+    //detect collisions
+      //detect collisions with each other 
+	//to detect collisions with respect to each other..the 2 balls in consideration have to be a diameter (the distance between their centers)of the ball away..then we can say that the balls have collided
+      //detect collisions against the wall
+	//to detect collisions against the wall the wall and the ball has to be a radius away..(that is distance between the center and the wall line)
+      
+    //perform collisions
+      //if the player ball has collided with the enemy ball end the game
+      //if two enemy balls collide then perform collision (according to the law of conservation of momentum)and update the values of the velocity only..
+      //if the enemy ball collides against the wall then only update the ball's atributes..
+      
+     for(var i = 0; i < all_balls.length; i++)//iterates through the object that contains all the balls to check collisions between them...
+     {
+			
+		for(var j = i+1; j < all_balls.length; j++)
+		{
+	  		 //may be have to cchange this condition when the big hunter comes into play...
+	  		 if(colliding(all_balls[i],all_balls[j]))
+	 		{
+	    //perform collisions
+	    
+	    
+	    //if player orb collides with enemy orb then .. no proper collision end the game...
+	   		 if((all_balls[i].ball_type == "enemy" && all_balls[j].ball_type == "player") || (all_balls[i].ball_type == "player" && all_balls[j].ball_type == "enemy")) //to check if player orb collided with enemy....
+	    		{
+	    			end_game();// explode functionality still to be written...
+	  	  
+	   		}
+	   		if((all_balls[i].ball_type == "treasure" && all_balls[j].ball_type == "player")||(all_balls[i].ball_type == "player" && all_balls[j].ball_type == "treasure")) //to check if player orb collided with enemy....
+	    		{
+	    			if(all_balls[i].ball_type =="treasure")
+	    				earn_treasure(i);// functionality still to be written...
+	    			else {
+						earn_treasure(j);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+					}
+	  	  
+	   		}
+	    		else // two enemy orbs collided..
+	   	 	{
+	    	  		do_enemy_collision(all_balls[i],all_balls[j]);
+	   		}
+	    //m1ix*v1ix + m2ix*v2ix = m1fx*v1fx + m2fx*v2fx; initial final mass and speeds of the x component 
+	    //m1iy*v1iy + m2iy*v2iy = m1fy*v1fy + m2fy*v2fy;
+	    
+	  		}//if len1...
+	}//for inner
+	
+	
+	//for wall collisions...
+	if(!within_range(all_balls[i]))
+	{
+		all_balls[i].velocity.x = -all_balls[i].velocity.x;
+		all_balls[i].velocity.y = -all_balls[i].velocity.y;
+	
+	}
+	
+     }
+	}////end of funtion collisions...............................
+	
+	function within_range(ball) 
+	{
+		var lenx= ball.place.x - X_CENTER;
+		var leny = ball.place.y - Y_CENTER;
+		if(Math.sqrt(lenx*lenx + leny*leny) < (ARENA_RADIUS - SMALL_RADIUS)-2) // the 2 is only for some kind of buffer.... so that the balls collide a little before the circle arena	
+			return true;
+		return false;
+	
+	}
+	function end_game() 
+	{
+		//for the moment alert end of game and quit...
+		clearTimeout(myVar);
+		alert("Points Earned : "+counter+"\nEND OF GAME!!");
+	}
+	
+	function generate_treasure()
+	{
+		
+		var loc = gen_rand_coord();
+		loc.x = loc.x + X_CENTER;
+		loc.y = loc.y + Y_CENTER;
+		//alert(loc.x)
+		//alert(loc.y)
+		var flag = generate_ball("treasure",loc,new vector(0,0));
+		
+		if(flag){
+			//alert(treasure_timer)
+			clearInterval(treasure_timer);
+			}
+			
+	}
+	function generate_enemy()
+	{
+		var random_speed = gen_rand_vel_cord();
+		var flag = generate_ball("enemy",new vector(X_CENTER,Y_CENTER),random_speed);
+		if(flag)
+			clearInterval(enemy_timer);
+	}
+	function earn_treasure(index) {
+		//alert(all_balls.length)
+				//alert(all_balls.length)
+				//alert(all_balls[index].ball_type);
+				all_balls.splice(index,1);
+				
+				//alert(all_balls.length)
+		
+		
+		treasure_timer = setInterval(generate_treasure,300);
+		//generate_ball("enemy",X_CENTER,Y_CENTER);
+		
+		enemy_timer = setInterval(generate_enemy,300);
+		counter++;
+	
+}
+  
+  function do_enemy_collision(orb1, orb2)// this is the function that calculates the velocities of the two balls after collision...
+  {
+    //calculate normal  unit vector
+    var diff_x = orb1.place.x - orb2.place.x;
+    var diff_y = orb1.place.y - orb2.place.y;
+    var len = Math.sqrt(diff_x*diff_x+diff_y*diff_y);
+    var unit_normal_vector = new vector(diff_x/len,diff_y/len);
+    
+    
+    //calculate the tangent vector,
+    var unit_tangential_vector = new vector(-unit_normal_vector.y,unit_normal_vector.x);
+    
+    //calculate tangential and normal components of the velocities...
+    var normal_vel1 = unit_normal_vector.x * orb1.velocity.x + unit_normal_vector.y * orb1.velocity.y;
+    var normal_vel2 = unit_normal_vector.x * orb2.velocity.x + unit_normal_vector.y * orb2.velocity.y;
+    var tangent_vel1 = unit_tangential_vector.x * orb1.velocity.x + unit_tangential_vector.y * orb1.velocity.y;
+    var tangent_vel2 = unit_tangential_vector.x * orb2.velocity.x + unit_tangential_vector.y * orb2.velocity.y;
+    
+    //new normal components of the velocities
+    var vel_final1 = (normal_vel1*(orb1.mass-orb2.mass) + 2*orb2.mass*normal_vel2) / (orb1.mass + orb2.mass);
+    var vel_final2 = (normal_vel2*(orb2.mass-orb1.mass) + 2*orb1.mass*normal_vel1) / (orb1.mass + orb2.mass);
+    
+    //new tangential components of the velocities are the same as the old so no new calculation..
+    
+    //finally convert the scalar velocities back to vectors be multiplying the unit tangent and unit normal..
+    var normal_vel1 = new vector(vel_final1 * unit_normal_vector.x,vel_final1 * unit_normal_vector.y);
+    var normal_vel2 = new vector(vel_final2 * unit_normal_vector.x,vel_final2 * unit_normal_vector.y);
+    
+    var tangent_vel1 = new vector(tangent_vel1 * unit_tangential_vector.x, tangent_vel1 * unit_tangential_vector.y);
+    var tangent_vel2 = new vector(tangent_vel2 * unit_tangential_vector.x, tangent_vel2 * unit_tangential_vector.y);
+    
+    orb1.velocity.x = normal_vel1.x + tangent_vel1.x;
+    orb1.velocity.y = normal_vel1.y + tangent_vel1.y;
+    
+    orb2.velocity.x = normal_vel2.x + tangent_vel2.x;
+    orb2.velocity.y = normal_vel2.y + tangent_vel2.y;
+     
+  }
+  function draw_canvas()
+  {
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(0,0,X_BOUNDARY,Y_BOUNDARY);
+    ctx.beginPath();
+    ctx.arc(X_CENTER,Y_CENTER,ARENA_RADIUS,0,2*Math.PI);
+    ctx.strokeStyle = "yellow";
+    ctx.stroke();
+    
+  }
+  /*
+//objects that are created as balls  
+  //var speed = new vector(2,3);
+  //var location = new vector(300,200);
+  var ball1 = new orb(new vector(0.1,0.7), new vector(300,200));
+  var ball2 = new orb(new vector(-0.3,0.3), new vector(300,200));
+  var ball3 = new orb(new vector(0.2,-1), new vector(300,200));
+  */
+  all_balls[0] = new orb(new vector(0,0),new vector(X_CENTER,Y_CENTER),"player",ORB_MASS);
+  all_balls[1] = new orb(new vector(0,0),new vector(450,100),"treasure",ORB_MASS);
+  function refresh()
+  {
+      counter++;
+      
+      draw_canvas();
+      move_balls();
+   	
+      collisions();
+      draw_balls();
+      
+  }
+  
+  ///////////////////new addtions ////////////////////
+  function gen_rand_vel_cord() //this is the function that generates random numbers bwteen -1 to 1 so that the velocities of all balls remain the same uncomment the var y...line
+  {
+    var x = Math.cos(Math.random()*10);
+    var y = Math.sqrt(1-x*x);
+    var r = Math.cos(Math.random()*10);y
+    if(r<0)
+     y = -y;
+    
+    return new vector(x,y);
+  }
+  function gen_rand_coord() {
+		var rand_num = Math.random();
+		var x = Math.cos(rand_num*10);
+		var sin_value = Math.sin(rand_num*10);
+		var y = Math.sin(Math.random()*10);
+		//document.write(x,"    ",y,"        ",sin_value,"       ",d,"<br/>");
+		if(Math.abs(y) >= Math.abs(sin_value))
+		{
+			//document.write(Math.abs(y),"     ", y, "     ", Math.abs(sin_value),"          ",sin_value,"<br/>");
+			y = y*0.5;		
+		}
+		//var d = Math.sqrt(x*x+y*y);
+		x = x*(ARENA_RADIUS-SMALL_RADIUS-10);
+		y = y*(ARENA_RADIUS-SMALL_RADIUS-10);
+		sin_value = sin_value*(ARENA_RADIUS-SMALL_RADIUS-10)
+		return new vector(x,sin_value);
+		
+}
+  
+  function generate_ball(ball_type,loc,velocity)
+  {
+      
+      var ball = new orb(velocity,loc,ball_type,ORB_MASS);
+		if(all_balls.length == 0)
+		{     
+			  	
+       	all_balls.push(ball);
+       	return true;
+      }
+      else
+      {
+      	var flag = true;
+      	for(var i=0; i < all_balls.length; i++)
+     		{
+     			
+      		if(colliding(ball,all_balls[i])) // generates a ball only if there is no ball passing by the center at the time of generation.....
+      		{
+      			flag = false;
+      			return false;
+      		}
+      	}
+      	if(flag)
+      	{
+      		//var ball = new orb(new vector(random_speed[0],random_speed[1]),new vector(x_coord,y_coord),ball_type,ORB_MASS);
+      		all_balls.push(ball);
+      		return true;
+      		
+      	}
+      	
+      }
+    return false;
+  }
+  
+  
+  function draw_balls()
+  {
+    
+    for(var i = 0; i < all_balls.length; i++)
+    {
+      var x = all_balls[i].place.x;
+      var y = all_balls[i].place.y;
+      ctx.beginPath();
+      ctx.arc(x,y,SMALL_RADIUS,0,2*Math.PI);
+      switch(all_balls[i].ball_type)
+      {
+			case "enemy":
+	    		ctx.strokeStyle = "#cc0099";
+	    		break;
+	    	case "player":
+	    		ctx.strokeStyle = "#ffffff";
+	    		break;
+	    	case "treasure":
+	    		ctx.strokeStyle = "#1020ee";
+	    		break;
+	    	default: break;
+      }
+      
+      ctx.stroke();
+    }
+  }
+  
+ ///////////new additions 10.12.2013///////////////////////////   
+  document.addEventListener("keydown",function (e) {doKeyDown(e)},false);
+  function doKeyDown(e)
+  {
+  		//alert(e.keyCode);
+  		switch(e.keyCode) {
+  			case 87: //w
+  				var ball = all_balls[0];
+  				ball.place.x = ball.place.x - 2*ball.velocity.x;
+  				ball.place.y = ball.place.y - 2*ball.velocity.y;
+  				/*if (ball.place.x < 0 || ball.place.x > 600 || ball.place.y < 0 || ball.place.y > 400) {
+				alert(ball.place.x);
+}*/
+				break;
+			case 83://s
+				ball.place.x = ball.place.x + 2*ball.velocity.x;
+  				ball.place.y = ball.place.y + 2*ball.velocity.y;
+				break;
+			
+			
+			default : break;
+			
+}
+    
+  }
+  document.addEventListener("mousemove",function (e) {rotate_ball(e)},false);
+  
+	var mousepos = new vector(1,1);  
+  
+  function rotate_ball(e) {
+  		var ball = all_balls[0];
+  		if(e.clientX!=null && e.clientY!=null)  	
+  		{	
+	  		var diff_x = mousepos.x - e.clientX;
+	  		var diff_y = mousepos.y - e.clientY;
+	  		var len = Math.sqrt((diff_x*diff_x)+(diff_y*diff_y));
+	  		var vel_x = diff_x/len;
+	  		var vel_y = diff_y/len;
+	  		if(!(isNaN(vel_x)||isNaN(vel_y)))
+	  		{
+		  		ball.velocity.x = vel_x;
+		  		ball.velocity.y = vel_y;
+	  		}
+		  		
+	  		mousepos.x = e.clientX;
+	  		mousepos.y = e.clientY;
+  		}
+  		
+	
+}
+  
+ 
+  
+  
+ 
+  var myVar=setInterval(refresh,15);
+  
+</script>
+</body>
+</html>
+

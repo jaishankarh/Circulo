@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<meta http-equiv="content-type" content="application/xhtml+xml; charset=UTF-8">
+<script type="text/javascript">
+function gen_rand_coord() {
+		var rand_num = Math.random();
+		var x = Math.cos(rand_num*10);
+		var sin_value = Math.sin(rand_num*10);
+		var y = Math.sin(Math.random()*10);
+		document.write(x,"    ",y,"        ",sin_value,"       ",d,"<br/>");
+		if(Math.abs(y) >= Math.abs(sin_value))
+		{
+			document.write(Math.abs(y),"     ", y, "     ", Math.abs(sin_value),"          ",sin_value,"<br/>");
+			y = y*0.5;		
+		}
+		var d = Math.sqrt(x*x+y*y);
+		document.write(x,"    ",y,"        ",sin_value,"       ",d);
+		// 	alert(d);
+		
+}
+
+gen_rand_coord();
+</script>
+</head>
+<body>
+
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Circulo</title>
+</head>
+
+<body>
+<canvas id="circulo" width="600" height="400" style="border:1px solid #000000">
+This is supported by my browser
+</canvas>
+
+<script>
+  var element = document.getElementById("circulo");
+  var ctx = element.getContext("2d");
+  ctx.fillStyle = "#000000";
+  ctx.fillRect(0,0,600,400);
+  
+  //definition of objects...
+  function vector(x,y)
+  {
+    this.x = x;
+    this.y = y;
+  }
+  
+  function orb(velocity,location)
+  {
+    this.location = location;
+    this.velocity = velocity;
+    
+  }
+  
+  
+  function move_ball(ball)
+  {
+    ball.location.x = ball.location.x + ball.velocity.x;
+    ball.location.y = ball.location.y + ball.velocity.y;
+  }
+  function draw_ball(ball)
+  {
+    var x = ball.location.x;
+    var y = ball.location.y;
+    ctx.beginPath();
+    ctx.arc(x,y,05,0,2*Math.PI);
+    ctx.strokeStyle = '#ffffff';
+    ctx.stroke();
+  }
+  function draw_canvas()
+  {
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(0,0,600,400);
+  }
+//objects that are created as balls  
+  //var speed = new vector(2,3);
+  //var location = new vector(300,200);
+  var ball1 = new orb(new vector(0.1,0.7), new vector(300,200));
+  var ball2 = new orb(new vector(-0.3,0.3), new vector(300,200));
+  var ball3 = new orb(new vector(0.2,-1), new vector(300,200));
+  function refresh()
+  {
+      draw_canvas();
+      move_ball(ball1);
+      move_ball(ball2);
+      move_ball(ball3);
+      draw_ball(ball1);
+      draw_ball(ball2);
+      draw_ball(ball3);
+  
+  }
+  
+  
+  
+ // var velocity = new Object();
+  //velocity.x_comp = 
+  //var orb = new Object();
+  //orb
+  //var myVar=setInterval(function(){refresh()},33);
+  
+</script>
+</body>
+</html>
+

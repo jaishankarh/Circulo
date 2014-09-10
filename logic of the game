@@ -1,0 +1,62 @@
+any new ideas or logic can be part of this text... it is like some rough pad where ideas just jump in and i note down... nothin needs to be conccrete or fixed in this text..
+
+events based on a timeline tthat is defined by the timer event handler
+
+the timer event handler keeps calling the main loop function of the game which calls, checks and does everything necessary
+
+The main function of the game contains:
+  draw the balls
+  check for colllisions
+    check if user ball has collided with pink ball.....game ends then
+  generate new balls
+  update the state of all objects
+  
+
+
+on a seperate side the user event handling will take place.. so when ever the user presses a key:
+  the user ball moves
+  check for collisions
+  generate new balls
+  update the state of all objects
+  
+The different functions i can think of..:
+  collision detector
+  perform collisions
+  draw ball objects
+  ball generator
+    white
+    pink
+  
+  
+  
+  collision detector:
+    if the user ball collides with any other pink ball then game ends...
+    to detect collision we can check:
+      if( the ball1 center is at least a diameter away from ball2 )
+	then we can say that the balls are not colliding
+      else we say that the balls have already collided or are colliding..
+      
+      the detector has to check collisions considering every pair of ball objects..as the number of ball objects grow the permutations can increase....
+      
+  
+    
+  
+  perform collisions:
+    maintain momentum..
+    calculate new velocities..
+    
+    
+  generate new balls:
+    initialize them with a velocity downward...randomize the downward angle (but randomize within a range)
+    
+    
+  ball object:
+    contains:
+      a speed vector (which contains an  x component and a y component)
+      type attribute
+      current location (defined by x, y coordinates)
+      
+    
+  
+    
+    

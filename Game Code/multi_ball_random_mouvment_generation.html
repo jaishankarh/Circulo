@@ -1,0 +1,140 @@
+<!--in this program multiple balls get generated from the center and are pushed away in random directions.. this script was written only to try out the random generation of balls...and also drawing dynamically all the ball objects
+in this program every ball has a speed vector and a location vector associated with it. the screen refreshes draws all the balls and the background triggered by a timing event...
+there is yet no user ball and no collision detector in this module..
+Date: 7.12.2013
+author: jaishankar hebballi
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Circulo</title>
+</head>
+
+<body>
+<canvas id="circulo" width="600" height="400" style="border:1px solid #000000">
+This is supported by my browser
+</canvas>
+
+<script>
+  var X_CENTER = 300;
+  var Y_CENTER = 200;
+  var X_BOUNDARY = 600;
+  var Y_BOUNDARY = 400;
+  var SMALL_RADIUS = 5;
+  var counter = 0;
+  
+  var all_balls = new Array(); // this array object stores all the balls that are currently produced in the program
+  
+  var element = document.getElementById("circulo");
+  var ctx = element.getContext("2d");
+  ctx.fillStyle = "#000000";
+  ctx.fillRect(0,0,X_BOUNDARY,Y_BOUNDARY);
+  
+  
+  //definition of objects...
+  function vector(x,y) // this object basically stores x and y components of either the velocity of the ball or the location
+  {
+    this.x = x;
+    this.y = y;
+  }
+  
+  function orb(velocity,location) // this is the generic ball that is generated and drawn randomly..
+  {
+    
+    this.location = location;
+    this.velocity = velocity;
+    
+  }
+  
+  
+  function move_balls() // this function adds the velocity vector to the location vector (repesct to the ball) every time it is called.. hence giving an illusion of speed..
+  {
+    
+    for(var i = 0; i < all_balls.length; i++)
+    {
+      all_balls[i].location.x = all_balls[i].location.x + all_balls[i].velocity.x;
+      all_balls[i].location.y = all_balls[i].location.y + all_balls[i].velocity.y;
+    }
+  }
+  
+  function draw_canvas()
+  {
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(0,0,X_BOUNDARY,Y_BOUNDARY);
+  }
+  /*
+//objects that are created as balls  
+  //var speed = new vector(2,3);
+  //var location = new vector(300,200);
+  var ball1 = new orb(new vector(0.1,0.7), new vector(300,200));
+  var ball2 = new orb(new vector(-0.3,0.3), new vector(300,200));
+  var ball3 = new orb(new vector(0.2,-1), new vector(300,200));
+  */
+  generate_ball();
+  function refresh()
+  {
+      counter++;
+      if(counter%30 == 0)
+      {
+	generate_ball();
+      }
+      draw_canvas();
+      move_balls();
+      draw_balls();
+      
+  }
+  
+  ///////////////////new addtions ////////////////////
+  function gen_rand_vel_cord() //this is the function that generates random numbers bwteen -1 to 1 so that the velocities of all balls remain the same uncomment the var y...line
+  {
+    var x = Math.cos(Math.random()*10);
+    //var y = Math.sqrt(1-x*x);
+    var r = Math.cos(Math.random()*10);
+    //if(r<0)
+     // y = -y;
+    
+    return [x,r];
+  }
+  
+  
+  function generate_ball()
+  {
+      var random_speed = gen_rand_vel_cord();
+      var ball = new orb(new vector(random_speed[0],random_speed[1]),new vector(X_CENTER,Y_CENTER));
+      all_balls.push(ball);
+    
+  }
+  function draw_balls()
+  {
+    
+    for(var i = 0; i < all_balls.length; i++)
+    {
+      var x = all_balls[i].location.x;
+      var y = all_balls[i].location.y;
+      ctx.beginPath();
+      ctx.arc(x,y,SMALL_RADIUS,0,2*Math.PI);
+      ctx.strokeStyle = '#ffffff';
+      ctx.stroke();
+    }
+  }
+  
+    
+  document.addEventListener("keypress",quit);
+  function quit()
+  {
+    clearTimeout(myVar);
+    alert(all_balls.length)
+  }
+  
+ 
+  
+  
+ 
+  var myVar=setInterval(refresh,15);
+  
+</script>
+</body>
+</html>
+
